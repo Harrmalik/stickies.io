@@ -60,7 +60,8 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	_reactDom2.default.render(_react2.default.createElement(_Board2.default, { count: 20 }), document.getElementById('react-container'));
+	var board = document.getElementById('board-name').innerText;
+	_reactDom2.default.render(_react2.default.createElement(_Board2.default, { count: 20, board: board }), document.getElementById('react-container'));
 
 /***/ },
 /* 1 */
@@ -21483,7 +21484,7 @@
 	            return text.split('. ');
 	         }).then(function (array) {
 	            return array.forEach(function (sentence) {
-	               return _this.add(sentence);
+	               return _this.add(sentence, 'home');
 	            });
 	         }).catch(function (err) {
 	            console.log('couldn\'t get data');
@@ -21494,10 +21495,11 @@
 	      this.uniqueId = this.uniqueId || 0;
 	      return this.uniqueId++;
 	   },
-	   add: function add(text) {
+	   add: function add(text, board) {
 	      var notes = [].concat(_toConsumableArray(this.state.notes), [{
 	         id: this.nextId(),
-	         note: text
+	         note: text,
+	         board: board
 	      }]);
 	      this.setState({ notes: notes });
 	   },
@@ -21522,7 +21524,9 @@
 	      this.setState({ notes: notes });
 	   },
 	   eachNote: function eachNote(note) {
-	      return _react2.default.createElement(_Note2.default, { key: note.id, text: note.note, id: note.id, onChange: this.update, onRemove: this.remove, color: note.color || this.randomColor() });
+	      if (this.props.board === note.board) {
+	         return _react2.default.createElement(_Note2.default, { key: note.id, text: note.note, id: note.id, onChange: this.update, onRemove: this.remove, color: note.color || this.randomColor() });
+	      }
 	   },
 	   render: function render() {
 	      var _this2 = this;

@@ -26,7 +26,7 @@ var Board = React.createClass({
             .then(array => array[0])
             .then(text => text.split('. '))
             .then(array => array.forEach(
-               sentence => this.add(sentence)
+               sentence => this.add(sentence, 'home')
             ))
             .catch(function(err) {
                console.log('couldn\'t get data')
@@ -37,12 +37,13 @@ var Board = React.createClass({
       this.uniqueId = this.uniqueId || 0
       return this.uniqueId++
    },
-   add(text) {
+   add(text, board) {
       var notes = [
          ...this.state.notes,
          {
             id: this.nextId(),
-            note: text
+            note: text,
+            board
          }
       ]
       this.setState({notes})
@@ -66,7 +67,11 @@ var Board = React.createClass({
       this.setState({notes})
    },
    eachNote(note) {
-      return (<Note key={note.id} text={note.note} id={note.id} onChange={this.update} onRemove={this.remove} color={note.color || this.randomColor()}></Note>)
+        if (this.props.board === note.board) {
+             return (
+                 <Note key={note.id} text={note.note} id={note.id} onChange={this.update} onRemove={this.remove} color={note.color || this.randomColor()}></Note>
+            )
+        }
    },
    render() {
       return (
