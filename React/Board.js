@@ -1,5 +1,5 @@
 import React from 'react'
-import Note from './React/Note'
+import Note from './Note'
 
 var Board = React.createClass({
    propTypes: {
@@ -47,9 +47,17 @@ var Board = React.createClass({
       ]
       this.setState({notes})
    },
-   update(newText, id) {
+   randomColor() {
+       var colors = ['orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink', '']
+       return colors[Math.floor(Math.random() * (9 - 0) + 0)]
+   },
+   update(newText, id, color) {
       var notes = this.state.notes.map(
-         note => (note.id !== id) ? note : {...note, note:newText}
+         note => (note.id !== id) ? note : {
+             id,
+             color,
+             note: newText
+         }
       )
       this.setState({notes})
    },
@@ -58,13 +66,13 @@ var Board = React.createClass({
       this.setState({notes})
    },
    eachNote(note) {
-      return (<Note key={note.id} text={note.note} id={note.id} onChange={this.update} onRemove={this.remove}></Note>)
+      return (<Note key={note.id} text={note.note} id={note.id} onChange={this.update} onRemove={this.remove} color={note.color || this.randomColor()}></Note>)
    },
    render() {
       return (
          <div className="board">
             {this.state.notes.map(this.eachNote)}
-            <button onClick={() => this.add('')}>+</button>
+            <i className="add square huge green inverted icon" onClick={() => this.add('New Note')}></i>
          </div>
       )
    }

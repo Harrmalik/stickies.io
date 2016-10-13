@@ -9,8 +9,8 @@ var Note = React.createClass({
    },
    componentWillMount() {
       this.style = {
-         right: this.randomBetween(0, window.innerWidth - 150, 'px'),
-         top: this.randomBetween(0, window.innerHeight - 150, 'px'),
+         right: this.randomBetween(0, window.innerWidth - 200, 'px'),
+         top: this.randomBetween(0, window.innerHeight - 200, 'px'),
          transform: 'rotate(' + this.randomBetween(-15, 15, 'deg)')
       }
    },
@@ -33,24 +33,24 @@ var Note = React.createClass({
       this.props.onRemove(this.props.id);
    },
    save() {
-      this.props.onChange(this.refs.newText.value, this.props.id);
+      this.props.onChange(this.refs.newText.value, this.props.id, this.props.color);
       this.setState({editing: false});
    },
    renderForm() {
       return (
-         <div className="note" style={this.style}>
+         <div className={"ui raised secondary segment note inverted " + this.props.color} style={this.style}>
             <textarea ref="newText" defaultValue={this.props.text}></textarea>
-            <button onClick={this.save}>save</button>
+            <i className=" large save icon link inverted" onClick={this.save}></i>
          </div>
       )
    },
    rendorDisplay(){
       return (
-         <div className="note" style={this.style}>
+         <div className={"ui raised secondary segment note inverted " + this.props.color} style={this.style}>
+            <i className="remove red large link icon" onClick={this.remove}></i>
             <p>{this.props.text}</p>
             <span>
-               <button onClick={this.edit}>Edit</button>
-               <button onClick={this.remove}>X</button>
+               <i className="large edit link icon" onClick={this.edit}></i>
             </span>
          </div>
       )

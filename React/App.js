@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Board from './React/Board.js'
+import Board from './Board'
 
-ReactDOM.render(<Board count={10}/>,
+ReactDOM.render(<Board count={20}/>,
 document.getElementById('react-container'));
