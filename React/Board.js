@@ -42,7 +42,7 @@ var Board = React.createClass({
          ...this.state.notes,
          {
             id: this.nextId(),
-            note: text,
+            text,
             board
          }
       ]
@@ -52,12 +52,13 @@ var Board = React.createClass({
        var colors = ['orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink', '']
        return colors[Math.floor(Math.random() * (9 - 0) + 0)]
    },
-   update(newText, id, color) {
+   update(id, text, board, color) {
       var notes = this.state.notes.map(
          note => (note.id !== id) ? note : {
              id,
-             color,
-             note: newText
+             text,
+             board,
+             color
          }
       )
       this.setState({notes})
@@ -69,7 +70,14 @@ var Board = React.createClass({
    eachNote(note) {
         if (this.props.board === note.board) {
              return (
-                 <Note key={note.id} text={note.note} id={note.id} onChange={this.update} onRemove={this.remove} color={note.color || this.randomColor()}></Note>
+                 <Note
+                    key={note.id}
+                    id={note.id}
+                    text={note.text}
+                    board={this.props.board}
+                    color={note.color || this.randomColor()}
+                    onChange={this.update}
+                    onRemove={this.remove} />
             )
         }
    },
@@ -77,7 +85,7 @@ var Board = React.createClass({
       return (
          <div className="board">
             {this.state.notes.map(this.eachNote)}
-            <i className="add square huge green inverted icon" onClick={() => this.add('New Note')}></i>
+            <i className="add square huge green inverted icon" onClick={() => this.add('New Note', this.props.board)}></i>
          </div>
       )
    }

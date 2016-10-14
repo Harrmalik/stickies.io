@@ -21498,7 +21498,7 @@
 	   add: function add(text, board) {
 	      var notes = [].concat(_toConsumableArray(this.state.notes), [{
 	         id: this.nextId(),
-	         note: text,
+	         text: text,
 	         board: board
 	      }]);
 	      this.setState({ notes: notes });
@@ -21507,12 +21507,13 @@
 	      var colors = ['orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink', ''];
 	      return colors[Math.floor(Math.random() * (9 - 0) + 0)];
 	   },
-	   update: function update(newText, id, color) {
+	   update: function update(id, text, board, color) {
 	      var notes = this.state.notes.map(function (note) {
 	         return note.id !== id ? note : {
 	            id: id,
-	            color: color,
-	            note: newText
+	            text: text,
+	            board: board,
+	            color: color
 	         };
 	      });
 	      this.setState({ notes: notes });
@@ -21525,7 +21526,14 @@
 	   },
 	   eachNote: function eachNote(note) {
 	      if (this.props.board === note.board) {
-	         return _react2.default.createElement(_Note2.default, { key: note.id, text: note.note, id: note.id, onChange: this.update, onRemove: this.remove, color: note.color || this.randomColor() });
+	         return _react2.default.createElement(_Note2.default, {
+	            key: note.id,
+	            id: note.id,
+	            text: note.text,
+	            board: this.props.board,
+	            color: note.color || this.randomColor(),
+	            onChange: this.update,
+	            onRemove: this.remove });
 	      }
 	   },
 	   render: function render() {
@@ -21536,7 +21544,7 @@
 	         { className: 'board' },
 	         this.state.notes.map(this.eachNote),
 	         _react2.default.createElement('i', { className: 'add square huge green inverted icon', onClick: function onClick() {
-	               return _this2.add('New Note');
+	               return _this2.add('New Note', _this2.props.board);
 	            } })
 	      );
 	   }
@@ -21597,7 +21605,7 @@
 	      this.props.onRemove(this.props.id);
 	   },
 	   save: function save() {
-	      this.props.onChange(this.refs.newText.value, this.props.id, this.props.color);
+	      this.props.onChange(this.props.id, this.refs.newText.value, this.props.board, this.props.color);
 	      this.setState({ editing: false });
 	   },
 	   renderForm: function renderForm() {

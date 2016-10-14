@@ -33,7 +33,7 @@ var Note = React.createClass({
       this.props.onRemove(this.props.id);
    },
    save() {
-      this.props.onChange(this.refs.newText.value, this.props.id, this.props.color);
+      this.props.onChange( this.props.id, this.refs.newText.value, this.props.board, this.props.color);
       this.setState({editing: false});
    },
    renderForm() {
