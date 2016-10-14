@@ -13,7 +13,7 @@ var Note = React.createClass({
          top: this.randomBetween(0, window.innerHeight - 200, 'px'),
          transform: 'rotate(' + this.randomBetween(-15, 15, 'deg)')
       }
-   },
+  },
    componentDidUpdate() {
       if (this.state.editing) {
          this.refs.newText.focus()

@@ -19,33 +19,49 @@ var Board = React.createClass({
       }
    },
    componentWillMount() {
-      if (this.props.count) {
-         var url = `http://baconipsum.com/api/?type=all-meat&sentences=${this.props.count}`
-         fetch(url)
-            .then(results => results.json())
-            .then(array => array[0])
-            .then(text => text.split('. '))
-            .then(array => array.forEach(
-               sentence => this.add(sentence, 'home')
-            ))
-            .catch(function(err) {
-               console.log('couldn\'t get data')
-            })
-      }
+    //   if (this.props.count) {
+    //      var url = `http://baconipsum.com/api/?type=all-meat&sentences=${this.props.count}`
+    //      fetch(url)
+    //         .then(results => results.json())
+    //         .then(array => array[0])
+    //         .then(text => text.split('. '))
+    //         .then(array => array.forEach(
+    //            sentence => this.add(sentence, 'home')
+    //         ))
+    //         .catch(function(err) {
+    //            console.log('couldn\'t get data')
+    //         })
+    //   }
    },
-   nextId(){
-      this.uniqueId = this.uniqueId || 0
-      return this.uniqueId++
+   componentDidMount() {
+       var component = this
+       socket.on('new note', function(note) {
+           component.create(note)
+       })
+       socket.on('update note', function(id, text, board, color) {
+           component.update(id, text, board, color)
+       })
+       socket.on('remove note', function(id) {
+           component.remove(id)
+       })
    },
    add(text, board) {
+       var color = this.randomColor()
+       var note = {
+           id: this.state.notes.length,
+           text,
+           board,
+           color
+       }
+       socket.emit('new note', note)
+       this.create(note)
+   },
+   create(note) {
       var notes = [
          ...this.state.notes,
-         {
-            id: this.nextId(),
-            text,
-            board
-         }
+        note
       ]
+
       this.setState({notes})
    },
    randomColor() {
@@ -61,10 +77,12 @@ var Board = React.createClass({
              color
          }
       )
+      socket.emit('update note', id, text, board, color)
       this.setState({notes})
    },
    remove(id) {
       var notes = this.state.notes.filter(note => note.id !== id);
+      socket.emit('remove note', id)
       this.setState({notes})
    },
    eachNote(note) {

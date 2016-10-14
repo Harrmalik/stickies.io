@@ -20,6 +20,19 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+var io = require('socket.io')(server);
+io.on('connection', function(client){
+    client.join('yolo');
+    client.on('new note', function(note) {
+        client.to('yolo').emit('new note', note);
+    });
+    client.on('update note', function(id, text, board, color) {
+        client.to('yolo').emit('update note', id, text, board, color)
+    });
+    client.on('remove note', function(id) {
+        client.to('yolo').emit('remove note', id)
+    });
+});
 
 /**
  * Listen on provided port, on all network interfaces.

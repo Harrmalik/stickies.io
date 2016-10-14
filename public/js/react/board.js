@@ -21472,35 +21472,46 @@
 	      };
 	   },
 	   componentWillMount: function componentWillMount() {
-	      var _this = this;
-
-	      if (this.props.count) {
-	         var url = 'http://baconipsum.com/api/?type=all-meat&sentences=' + this.props.count;
-	         fetch(url).then(function (results) {
-	            return results.json();
-	         }).then(function (array) {
-	            return array[0];
-	         }).then(function (text) {
-	            return text.split('. ');
-	         }).then(function (array) {
-	            return array.forEach(function (sentence) {
-	               return _this.add(sentence, 'home');
-	            });
-	         }).catch(function (err) {
-	            console.log('couldn\'t get data');
-	         });
-	      }
+	      //   if (this.props.count) {
+	      //      var url = `http://baconipsum.com/api/?type=all-meat&sentences=${this.props.count}`
+	      //      fetch(url)
+	      //         .then(results => results.json())
+	      //         .then(array => array[0])
+	      //         .then(text => text.split('. '))
+	      //         .then(array => array.forEach(
+	      //            sentence => this.add(sentence, 'home')
+	      //         ))
+	      //         .catch(function(err) {
+	      //            console.log('couldn\'t get data')
+	      //         })
+	      //   }
 	   },
-	   nextId: function nextId() {
-	      this.uniqueId = this.uniqueId || 0;
-	      return this.uniqueId++;
+	   componentDidMount: function componentDidMount() {
+	      var component = this;
+	      socket.on('new note', function (note) {
+	         component.create(note);
+	      });
+	      socket.on('update note', function (id, text, board, color) {
+	         component.update(id, text, board, color);
+	      });
+	      socket.on('remove note', function (id) {
+	         component.remove(id);
+	      });
 	   },
 	   add: function add(text, board) {
-	      var notes = [].concat(_toConsumableArray(this.state.notes), [{
-	         id: this.nextId(),
+	      var color = this.randomColor();
+	      var note = {
+	         id: this.state.notes.length,
 	         text: text,
-	         board: board
-	      }]);
+	         board: board,
+	         color: color
+	      };
+	      socket.emit('new note', note);
+	      this.create(note);
+	   },
+	   create: function create(note) {
+	      var notes = [].concat(_toConsumableArray(this.state.notes), [note]);
+
 	      this.setState({ notes: notes });
 	   },
 	   randomColor: function randomColor() {
@@ -21516,12 +21527,14 @@
 	            color: color
 	         };
 	      });
+	      socket.emit('update note', id, text, board, color);
 	      this.setState({ notes: notes });
 	   },
 	   remove: function remove(id) {
 	      var notes = this.state.notes.filter(function (note) {
 	         return note.id !== id;
 	      });
+	      socket.emit('remove note', id);
 	      this.setState({ notes: notes });
 	   },
 	   eachNote: function eachNote(note) {
@@ -21537,14 +21550,14 @@
 	      }
 	   },
 	   render: function render() {
-	      var _this2 = this;
+	      var _this = this;
 
 	      return _react2.default.createElement(
 	         'div',
 	         { className: 'board' },
 	         this.state.notes.map(this.eachNote),
 	         _react2.default.createElement('i', { className: 'add square huge green inverted icon', onClick: function onClick() {
-	               return _this2.add('New Note', _this2.props.board);
+	               return _this.add('New Note', _this.props.board);
 	            } })
 	      );
 	   }
