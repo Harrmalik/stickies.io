@@ -35,14 +35,14 @@ var Board = React.createClass({
    },
    componentDidMount() {
        var component = this
-       socket.on('new note', function(note) {
+       socket.on('note created', function(note) {
            component.create(note)
        })
-       socket.on('update note', function(id, text, board, color) {
-           component.update(id, text, board, color)
+       socket.on('note updated', function(id, text, board, color) {
+           component.update(id, text, board, color, true)
        })
-       socket.on('remove note', function(id) {
-           component.remove(id)
+       socket.on('note removed', function(id) {
+           component.remove(id, true)
        })
    },
    add(text, board) {
@@ -61,14 +61,13 @@ var Board = React.createClass({
          ...this.state.notes,
         note
       ]
-
       this.setState({notes})
    },
    randomColor() {
        var colors = ['orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink', '']
        return colors[Math.floor(Math.random() * (9 - 0) + 0)]
    },
-   update(id, text, board, color) {
+   update(id, text, board, color, emitted) {
       var notes = this.state.notes.map(
          note => (note.id !== id) ? note : {
              id,
@@ -77,12 +76,14 @@ var Board = React.createClass({
              color
          }
       )
-      socket.emit('update note', id, text, board, color)
+      if (!emitted)
+        socket.emit('updated note', id, text, board, color)
       this.setState({notes})
    },
-   remove(id) {
-      var notes = this.state.notes.filter(note => note.id !== id);
-      socket.emit('remove note', id)
+   remove(id, emitted) {
+      var notes = this.state.notes.filter(note => note.id !== id)
+      if (!emitted)
+        socket.emit('removed note', id)
       this.setState({notes})
    },
    eachNote(note) {
