@@ -61,7 +61,7 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var board = document.getElementById('board-name').innerText;
-	_reactDom2.default.render(_react2.default.createElement(_Board2.default, { count: 20, board: board }), document.getElementById('react-container'));
+	_reactDom2.default.render(_react2.default.createElement(_Board2.default, { board: board }), document.getElementById('react-container'));
 
 /***/ },
 /* 1 */
@@ -21437,7 +21437,7 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	   value: true
+	    value: true
 	});
 
 	var _react = __webpack_require__(1);
@@ -21453,113 +21453,133 @@
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	var Board = _react2.default.createClass({
-	   displayName: 'Board',
+	    displayName: 'Board',
 
-	   propTypes: {
-	      count: function count(props, propName) {
-	         if (typeof props[propName] !== "number") {
-	            return new Error("the count must be a number");
-	         }
+	    propTypes: {
+	        board: function board(props, propName) {
+	            if (typeof props[propName] !== "string") {
+	                return new Error("The board must be a string");
+	            }
+	        }
+	    },
+	    getInitialState: function getInitialState() {
+	        return {
+	            notes: []
+	        };
+	    },
+	    componentWillMount: function componentWillMount() {
+	        var _this = this;
 
-	         if (props[propName] > 100) {
-	            return new Error('Creating ' + 100 + ' notes is too many notes');
-	         }
-	      }
-	   },
-	   getInitialState: function getInitialState() {
-	      return {
-	         notes: []
-	      };
-	   },
-	   componentWillMount: function componentWillMount() {
-	      //   if (this.props.count) {
-	      //      var url = `http://baconipsum.com/api/?type=all-meat&sentences=${this.props.count}`
-	      //      fetch(url)
-	      //         .then(results => results.json())
-	      //         .then(array => array[0])
-	      //         .then(text => text.split('. '))
-	      //         .then(array => array.forEach(
-	      //            sentence => this.add(sentence, 'home')
-	      //         ))
-	      //         .catch(function(err) {
-	      //            console.log('couldn\'t get data')
-	      //         })
-	      //   }
-	   },
-	   componentDidMount: function componentDidMount() {
-	      var component = this;
-	      socket.on('note created', function (note) {
-	         component.create(note);
-	      });
-	      socket.on('note updated', function (id, text, board, color) {
-	         component.update(id, text, board, color, true);
-	      });
-	      socket.on('note removed', function (id) {
-	         component.remove(id, true);
-	      });
-	   },
-	   add: function add(text, board) {
-	      var color = this.randomColor();
-	      var note = {
-	         id: this.state.notes.length,
-	         text: text,
-	         board: board,
-	         color: color
-	      };
-	      socket.emit('new note', note);
-	      this.create(note);
-	   },
-	   create: function create(note) {
-	      var notes = [].concat(_toConsumableArray(this.state.notes), [note]);
-	      this.setState({ notes: notes });
-	   },
-	   randomColor: function randomColor() {
-	      var colors = ['orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink', ''];
-	      return colors[Math.floor(Math.random() * (9 - 0) + 0)];
-	   },
-	   update: function update(id, text, board, color, emitted) {
-	      var notes = this.state.notes.map(function (note) {
-	         return note.id !== id ? note : {
-	            id: id,
+	        var url = 'http://localhost:3000/api/notes/' + this.props.board;
+	        fetch(url).then(function (results) {
+	            return results.json();
+	        }).then(function (notes) {
+	            return _this.setState({ notes: notes });
+	        }).catch(function (err) {
+	            console.log('couldn\'t get data');
+	        });
+	    },
+	    componentDidMount: function componentDidMount() {
+	        var component = this;
+	        socket.on('note created', function (note) {
+	            component.create(note);
+	        });
+	        socket.on('note updated', function (_id, text, board, color) {
+	            component.update(_id, text, board, color, true);
+	        });
+	        socket.on('note removed', function (_id) {
+	            component.remove(_id, true);
+	        });
+	    },
+	    add: function add(text, board, color) {
+	        var component = this;
+	        var color = color ? color : this.randomColor();
+	        var note = {
 	            text: text,
 	            board: board,
 	            color: color
-	         };
-	      });
-	      if (!emitted) socket.emit('updated note', id, text, board, color);
-	      this.setState({ notes: notes });
-	   },
-	   remove: function remove(id, emitted) {
-	      var notes = this.state.notes.filter(function (note) {
-	         return note.id !== id;
-	      });
-	      if (!emitted) socket.emit('removed note', id);
-	      this.setState({ notes: notes });
-	   },
-	   eachNote: function eachNote(note) {
-	      if (this.props.board === note.board) {
-	         return _react2.default.createElement(_Note2.default, {
-	            key: note.id,
-	            id: note.id,
-	            text: note.text,
-	            board: this.props.board,
-	            color: note.color || this.randomColor(),
-	            onChange: this.update,
-	            onRemove: this.remove });
-	      }
-	   },
-	   render: function render() {
-	      var _this = this;
+	        };
 
-	      return _react2.default.createElement(
-	         'div',
-	         { className: 'board' },
-	         this.state.notes.map(this.eachNote),
-	         _react2.default.createElement('i', { className: 'add square huge green inverted icon', onClick: function onClick() {
-	               return _this.add('New Note', _this.props.board);
-	            } })
-	      );
-	   }
+	        var headers = new Headers();
+	        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+	        fetch('http://localhost:3000/api/notes/' + this.props.board, { method: 'POST', body: JSON.stringify(note), headers: headers }).then(function (response) {
+	            if (response.status == 200) return response.json();else throw new Error('Something went wrong on api server!');
+	        }).then(function (data) {
+	            socket.emit('new note', data);
+	            component.create(data);
+	        }).catch(function (error) {
+	            console.error(error);
+	        });
+	    },
+	    create: function create(note) {
+	        var notes = [].concat(_toConsumableArray(this.state.notes), [note]);
+	        this.setState({ notes: notes });
+	    },
+	    randomColor: function randomColor() {
+	        var colors = ['orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink', ''];
+	        return colors[Math.floor(Math.random() * (9 - 0) + 0)];
+	    },
+	    update: function update(_id, text, board, color, emitted) {
+	        var component = this;
+	        var newNote = {
+	            _id: _id,
+	            text: text,
+	            board: board,
+	            color: color
+	        };
+	        var notes = this.state.notes.map(function (note) {
+	            return note._id !== _id ? note : newNote;
+	        });
+	        if (!emitted) socket.emit('updated note', _id, text, board, color);
+
+	        var headers = new Headers();
+	        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+	        fetch('http://localhost:3000/api/notes/' + this.props.board, { method: 'PUT', body: JSON.stringify(newNote), headers: headers }).then(function (response) {
+	            if (response.status == 200) return response.json();else throw new Error('Something went wrong on api server!');
+	        }).catch(function (error) {
+	            console.error(error);
+	        });
+
+	        this.setState({ notes: notes });
+	    },
+	    remove: function remove(_id, emitted) {
+	        var notes = this.state.notes.filter(function (note) {
+	            return note._id !== _id;
+	        });
+	        if (!emitted) socket.emit('removed note', _id);
+	        var headers = new Headers();
+	        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+	        fetch('http://localhost:3000/api/notes/' + this.props.board, { method: 'DELETE', body: JSON.stringify(_id), headers: headers }).then(function (response) {
+	            if (response.status == 200) return response.json();else throw new Error('Something went wrong on api server!');
+	        }).catch(function (error) {
+	            console.error(error);
+	        });
+	        this.setState({ notes: notes });
+	    },
+	    eachNote: function eachNote(note) {
+	        if (this.props.board === note.board) {
+	            return _react2.default.createElement(_Note2.default, {
+	                key: note._id,
+	                _id: note._id,
+	                text: note.text,
+	                board: note.board,
+	                color: note.color || this.randomColor(),
+	                onChange: this.update,
+	                onRemove: this.remove });
+	        }
+	    },
+	    render: function render() {
+	        var _this2 = this;
+
+	        return _react2.default.createElement(
+	            'div',
+	            { className: 'board' },
+	            this.state.notes.map(this.eachNote),
+	            _react2.default.createElement('i', { className: 'add square huge green inverted icon', onClick: function onClick() {
+	                    return _this2.add('New Note', _this2.props.board);
+	                } })
+	        );
+	    }
 	});
 
 	exports.default = Board;
@@ -21614,10 +21634,10 @@
 	      this.setState({ editing: true });
 	   },
 	   remove: function remove() {
-	      this.props.onRemove(this.props.id);
+	      this.props.onRemove(this.props._id);
 	   },
 	   save: function save() {
-	      this.props.onChange(this.props.id, this.refs.newText.value, this.props.board, this.props.color);
+	      this.props.onChange(this.props._id, this.refs.newText.value, this.props.board, this.props.color);
 	      this.setState({ editing: false });
 	   },
 	   renderForm: function renderForm() {
