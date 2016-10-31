@@ -26,6 +26,9 @@ io.on('connection', function(client){
     client.on('new note', function(note) {
         client.to('yolo').emit('note created', note);
     });
+    client.on('show new note', function(note) {
+        client.to('yolo').emit('reload', note);
+    });
     client.on('updated note', function(id, text, board, color) {
         client.to('yolo').emit('note updated', id, text, board, color);
     });

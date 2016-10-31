@@ -78,4 +78,13 @@ div.note i.save {
   position: fixed;
   top: 10px;
   right: 10px;
-}''
+}
+
+.notification.ui.message {
+    padding-bottom: 14px;
+    margin-bottom: 0px;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+}

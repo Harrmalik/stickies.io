@@ -1,5 +1,6 @@
 import React from 'react'
 import Note from './Note'
+import Notification from './Notification'
 
 var Board = React.createClass({
    propTypes: {
@@ -15,18 +16,15 @@ var Board = React.createClass({
       }
    },
    componentWillMount() {
-     var url = `http://localhost:3000/api/notes/${this.props.board}`
-     fetch(url)
-        .then(results => results.json())
-        .then(notes => this.setState({notes}))
-        .catch(function(err) {
-           console.log('couldn\'t get data')
-        })
+       this.getNotes()
    },
    componentDidMount() {
        var component = this
+       socket.on('reload', function() {
+           component.getNotes()
+       })
        socket.on('note created', function(note) {
-           component.create(note)
+           //component.create(note)
        })
        socket.on('note updated', function(_id, text, board, color) {
            component.update(_id, text, board, color, true)
@@ -34,6 +32,16 @@ var Board = React.createClass({
        socket.on('note removed', function(_id) {
            component.remove(_id, true)
        })
+   },
+   getNotes() {
+     var url = `http://localhost:3000/api/notes/${this.props.board}`
+     fetch(url)
+        .then(results => results.json())
+        .then(notes => this.setState({notes}))
+        .catch(function(err) {
+           console.log('couldn\'t get data')
+        })
+    this.setState({updates: 0})
    },
    add(text, board, color) {
        var component = this
@@ -133,6 +141,7 @@ var Board = React.createClass({
          <div className="board">
             {this.state.notes.map(this.eachNote)}
             <i className="add square huge green inverted icon" onClick={() => this.add('New Note', this.props.board)}></i>
+            <Notification parent={this} updates={this.state.updates}/>
          </div>
       )
    }

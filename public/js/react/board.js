@@ -21448,6 +21448,10 @@
 
 	var _Note2 = _interopRequireDefault(_Note);
 
+	var _Notification = __webpack_require__(175);
+
+	var _Notification2 = _interopRequireDefault(_Notification);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -21468,6 +21472,24 @@
 	        };
 	    },
 	    componentWillMount: function componentWillMount() {
+	        this.getNotes();
+	    },
+	    componentDidMount: function componentDidMount() {
+	        var component = this;
+	        socket.on('reload', function () {
+	            component.getNotes();
+	        });
+	        socket.on('note created', function (note) {
+	            //component.create(note)
+	        });
+	        socket.on('note updated', function (_id, text, board, color) {
+	            component.update(_id, text, board, color, true);
+	        });
+	        socket.on('note removed', function (_id) {
+	            component.remove(_id, true);
+	        });
+	    },
+	    getNotes: function getNotes() {
 	        var _this = this;
 
 	        var url = 'http://localhost:3000/api/notes/' + this.props.board;
@@ -21478,18 +21500,7 @@
 	        }).catch(function (err) {
 	            console.log('couldn\'t get data');
 	        });
-	    },
-	    componentDidMount: function componentDidMount() {
-	        var component = this;
-	        socket.on('note created', function (note) {
-	            component.create(note);
-	        });
-	        socket.on('note updated', function (_id, text, board, color) {
-	            component.update(_id, text, board, color, true);
-	        });
-	        socket.on('note removed', function (_id) {
-	            component.remove(_id, true);
-	        });
+	        this.setState({ updates: 0 });
 	    },
 	    add: function add(text, board, color) {
 	        var component = this;
@@ -21577,7 +21588,8 @@
 	            this.state.notes.map(this.eachNote),
 	            _react2.default.createElement('i', { className: 'add square huge green inverted icon', onClick: function onClick() {
 	                    return _this2.add('New Note', _this2.props.board);
-	                } })
+	                } }),
+	            _react2.default.createElement(_Notification2.default, { parent: this, updates: this.state.updates })
 	        );
 	    }
 	});
@@ -23227,6 +23239,59 @@
 	});
 	;
 	//# sourceMappingURL=react-draggable.js.map
+
+/***/ },
+/* 175 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Notification = _react2.default.createClass({
+	    displayName: 'Notification',
+	    getInitialState: function getInitialState() {
+	        return {
+	            updates: this.props.updates || 0
+	        };
+	    },
+	    componentDidMount: function componentDidMount() {
+	        var component = this;
+	        socket.on('note created', function (note) {
+	            component.setState({ updates: component.state.updates + 1 });
+	        });
+	    },
+	    showUpdates: function showUpdates() {
+	        this.props.parent.getNotes();
+	        this.setState({ updates: 0 });
+	    },
+	    render: function render() {
+	        if (this.state.updates > 0) {
+	            return _react2.default.createElement(
+	                'div',
+	                { id: 'notification', className: 'notification ui orange message', onClick: this.showUpdates },
+	                _react2.default.createElement(
+	                    'a',
+	                    { className: 'ui blue circular label' },
+	                    this.state.updates
+	                ),
+	                ' New Note(s)'
+	            );
+	        } else {
+	            return _react2.default.createElement('div', null);
+	        }
+	    }
+	});
+
+	exports.default = Notification;
 
 /***/ }
 /******/ ]);
