@@ -21499,7 +21499,7 @@
 	    getNotes: function getNotes() {
 	        var _this = this;
 
-	        var url = 'http://localhost:3000/api/notes/' + this.props.board;
+	        var url = '/api/notes/' + this.props.board;
 	        fetch(url).then(function (results) {
 	            return results.json();
 	        }).then(function (notes) {
@@ -21520,7 +21520,7 @@
 
 	        var headers = new Headers();
 	        headers.append('Content-Type', 'application/x-www-form-urlencoded');
-	        fetch('http://localhost:3000/api/notes/' + this.props.board, { method: 'POST', body: JSON.stringify(note), headers: headers }).then(function (response) {
+	        fetch('/api/notes/' + this.props.board, { method: 'POST', body: JSON.stringify(note), headers: headers }).then(function (response) {
 	            if (response.status == 200) return response.json();else throw new Error('Something went wrong on api server!');
 	        }).then(function (data) {
 	            socket.emit('new note', data);
@@ -21563,7 +21563,7 @@
 
 	        var headers = new Headers();
 	        headers.append('Content-Type', 'application/x-www-form-urlencoded');
-	        fetch('http://localhost:3000/api/notes/' + this.props.board, { method: 'PUT', body: JSON.stringify(newNote), headers: headers }).then(function (response) {
+	        fetch('/api/notes/' + this.props.board, { method: 'PUT', body: JSON.stringify(newNote), headers: headers }).then(function (response) {
 	            if (response.status == 200) return response.json();else throw new Error('Something went wrong on api server!');
 	        }).catch(function (error) {
 	            console.error(error);
@@ -21578,7 +21578,7 @@
 	        if (!emitted) socket.emit('removed note', _id);
 	        var headers = new Headers();
 	        headers.append('Content-Type', 'application/x-www-form-urlencoded');
-	        fetch('http://localhost:3000/api/notes/' + this.props.board, { method: 'DELETE', body: JSON.stringify(_id), headers: headers }).then(function (response) {
+	        fetch('/api/notes/' + this.props.board, { method: 'DELETE', body: JSON.stringify(_id), headers: headers }).then(function (response) {
 	            if (response.status == 200) return response.json();else throw new Error('Something went wrong on api server!');
 	        }).catch(function (error) {
 	            console.error(error);

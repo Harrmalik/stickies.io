@@ -38,7 +38,7 @@ var Board = React.createClass({
        })
    },
    getNotes() {
-     var url = `http://localhost:3000/api/notes/${this.props.board}`
+     var url = `/api/notes/${this.props.board}`
      fetch(url)
         .then(results => results.json())
         .then(notes => this.setState({notes}))
@@ -58,7 +58,7 @@ var Board = React.createClass({
 
        var headers = new Headers();
        headers.append('Content-Type', 'application/x-www-form-urlencoded');
-       fetch(`http://localhost:3000/api/notes/${this.props.board}`, {method: 'POST', body: JSON.stringify(note), headers})
+       fetch(`/api/notes/${this.props.board}`, {method: 'POST', body: JSON.stringify(note), headers})
            .then(function(response) {
                if(response.status == 200) return response.json()
                else throw new Error('Something went wrong on api server!')
@@ -110,7 +110,7 @@ var Board = React.createClass({
 
     var headers = new Headers()
     headers.append('Content-Type', 'application/x-www-form-urlencoded')
-    fetch(`http://localhost:3000/api/notes/${this.props.board}`, {method: 'PUT', body: JSON.stringify(newNote), headers})
+    fetch(`/api/notes/${this.props.board}`, {method: 'PUT', body: JSON.stringify(newNote), headers})
         .then(function(response) {
             if(response.status == 200) return response.json()
             else throw new Error('Something went wrong on api server!')
@@ -127,7 +127,7 @@ var Board = React.createClass({
         socket.emit('removed note', _id)
         var headers = new Headers()
         headers.append('Content-Type', 'application/x-www-form-urlencoded')
-    fetch(`http://localhost:3000/api/notes/${this.props.board}`, {method: 'DELETE', body: JSON.stringify(_id), headers})
+    fetch(`/api/notes/${this.props.board}`, {method: 'DELETE', body: JSON.stringify(_id), headers})
         .then(function(response) {
             if(response.status == 200) return response.json()
             else throw new Error('Something went wrong on api server!')
