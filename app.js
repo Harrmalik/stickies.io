@@ -7,7 +7,10 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 require('./models/Notes');
 
-mongoose.connect('mongodb://localhost/stickies');
+//mongoose.connect('mongodb://localhost/stickies');
+
+mongoose.connect('mongodb://stickiesdb:password@ds017256.mlab.com:17256/heroku_t3knc29r/stickies');
+
 
 var routes = require('./routes/index');
 var api = require('./routes/api');

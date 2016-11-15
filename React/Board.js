@@ -1,6 +1,7 @@
 import React from 'react'
 import Note from './Note'
 import Notification from './Notification'
+import _ from 'lodash'
 
 var Board = React.createClass({
    propTypes: {
@@ -31,6 +32,9 @@ var Board = React.createClass({
        })
        socket.on('note removed', function(_id) {
            component.remove(_id, true)
+       })
+       socket.on('user editing', function(_id) {
+           component.editing(_id)
        })
    },
    getNotes() {
@@ -79,6 +83,17 @@ var Board = React.createClass({
        var colors = ['orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink', '']
        return colors[Math.floor(Math.random() * (9 - 0) + 0)]
    },
+   editing(_id) {
+       var notes = this.state.notes
+       _.map(notes, function(note){
+           if (note._id === _id) {
+               note.text = "NOTE BEING CHANGED BY ANOTHER USER"
+           }
+           return note
+       })
+       console.log(notes)
+       this.setState({notes})
+   },
    update(_id, text, board, color, emitted) {
        var component = this;
       var newNote = {
@@ -88,7 +103,7 @@ var Board = React.createClass({
            color
        }
       var notes = this.state.notes.map(
-         note => (note._id !== _id) ? note : newNote
+         note => (note._id !== newNote._id) ? note : newNote
       )
       if (!emitted)
         socket.emit('updated note', _id, text, board, color)

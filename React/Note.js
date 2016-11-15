@@ -27,14 +27,17 @@ var Note = React.createClass({
       return (x + Math.ceil(Math.random() * (y-x))) + s
    },
    edit() {
-      this.setState({editing: true});
+       socket.emit('editing note', this.props._id)
+
+      this.setState({editing: true})
    },
    remove() {
       this.props.onRemove(this.props._id);
    },
    save() {
       this.props.onChange( this.props._id, this.refs.newText.value, this.props.board, this.props.color);
-      this.setState({editing: false});
+      socket.emit('updated note', this.props._id, this.refs.newText.value, this.props.board, this.props.color)
+      this.setState({editing: false, text: ''});
    },
    renderForm() {
       return (
@@ -48,7 +51,7 @@ var Note = React.createClass({
       return (
          <div className={"ui raised secondary segment note inverted " + this.props.color} style={this.style}>
             <i className="remove red large link icon" onClick={this.remove}></i>
-            <p>{this.props.text}</p>
+            <p>{this.state.text || this.props.text}</p>
             <span>
                <i className="large edit link icon" onClick={this.edit}></i>
             </span>
